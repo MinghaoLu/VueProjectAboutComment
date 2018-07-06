@@ -47,6 +47,7 @@
                     }
                     );
 
+                this.comment = '';
             },
             // /*获取本地数据并且解析为JSON数据*/
             // fetch: function(name){
