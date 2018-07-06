@@ -1,6 +1,6 @@
 <template>
     <div class="commentShow">
-        <div class="singleComment" v-for='item in currentComments'>
+        <div class="singleComment" v-for='item in currentComments' v-bind:key="item.id">
             <p v-text='item.content'>评论</p>
             <span class="publisher" v-text='item.publisher'>发布者</span>
             <span class="createAt" v-text='item.created_at'>时间</span>
@@ -30,14 +30,17 @@
                 currentPage: 1,
             }
         },
+        props: [
+            'post'
+        ],
         methods: {
             /*有新评论*/
-            newCommentBePublished: function() {
+            // newCommentBePublished: function() {
                 /*获取全部评论*/
-                this.comments = Store.fetch('comments');
+                // this.comments = Store.fetch('comments');
                 /*重新计算评论条数*/
-                this.totalCount = this.comments.length;
-            },
+                // this.totalCount = this.comments.length;
+            // },
             /*改变页码时触发，page为页码*/
             handleCurrentChange: function(page) {
                 /*记录当前page*/
@@ -65,20 +68,22 @@
 
             },*/
         },
-        /*数据监听亦可*/
-        // watch: {
-        //     /*发表评论时触发*/
-        //     comments: {
-        //         handler(val,oldVal) {
-        //             console.log("hey,comments are changed!");
-        //         },
-        //         deep: true
-        //     },
-        // },
+        watch: {
+            /*发表评论时触发*/
+            post: {
+                handler(val) {
+                    console.log("hey,comment is changed!");
+                    this.comments.unshift(val)
+                    this.totalCount = this.comments.length;
+                    this.handleCurrentChange(1);
+                },
+                deep: true
+            },
+        },
         mounted: function() {
             this.$nextTick(()=>{
                 console.log(this.comments);
-                /*获取全部评论*/
+                /*初始化评论*/
                 this.comments = Store.fetch('comments');
                 this.totalCount = this.comments.length;
                 this.handleCurrentChange(1);

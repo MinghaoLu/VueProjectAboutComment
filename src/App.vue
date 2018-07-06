@@ -3,7 +3,7 @@
     <!-- <img src="./assets/logo.png"> -->
     <!-- 评论发送区域 -->
     <comPub v-on:new-comment='hasNewComment'></comPub>
-    <comShow ref='showComment'></comShow>
+    <comShow v-bind:post='singleComment'></comShow>
     <!-- 评论显示区域 -->
   </div>
 
@@ -17,18 +17,21 @@ export default {
   name: 'App',
   data: function() {
     return {
-      singleComment: '',
+      singleComment: {},
     }
   },
   components: {
     comPub,comShow
   },
   methods: {
-    hasNewComment: function() {
-      console.log('new Comment');
-      this.$refs.showComment.newCommentBePublished();
+    /*接收新评论并发送给子组件CommentsShow*/
+    hasNewComment: function(comment) {
+      console.log('new comment');
+      this.singleComment = comment;
+
+      /*this.$refs.showComment.newCommentBePublished();*/
       /*回到第一页*/
-      this.$refs.showComment.handleCurrentChange(1);
+      /*this.$refs.showComment.handleCurrentChange(1);*/
     }
   },
 }
