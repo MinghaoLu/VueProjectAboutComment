@@ -3,18 +3,45 @@
         <textarea name="comment" cols="40" rows="5" placeholder="请输入评论" autofocus="autofocus" v-model.trim="comment">
         </textarea>
         <input type="button" name="publish" value="发送" v-on:click='publish'>
+
+        <ul>
+            <li
+                is="commentsshow"
+                v-for="item in currentComments"
+                v-bind:key="item.id"
+                v-bind:post="item">
+            </li>
+        </ul>
+
+        <el-pagination
+            layout="prev, pager, next"
+            :total="totalCount"
+            :page-size="pageSize"
+            :current-page="currentPage"
+            v-on:current-change="setCurrentComments">
+        </el-pagination>
     </div>
 </template>
 
 <script>
     import Store from '../store.js'
+    import commentsshow from './CommentsShow.vue'
 
     export default {
         name: "CommentsPublish",/*可有可无*/
         data: function() {
             return {
+                storageName: 'comments',
                 comment: '',
+                currentComments: [],
+                comments: [],
+                totalCount: 0,
+                pageSize: 5,
+                currentPage: 1,
             }
+        },
+        components: {
+            commentsshow
         },
         methods: {
             /*发送评论*/
@@ -32,20 +59,15 @@
                 date = date.toLocaleString();
                 let publisher = "LMH";
 
+                let singleComment = {
+                    "id":id,"publisher":publisher,"content":this.comment,"created_at":date};
                 /*存储到localStorage中*/
-                const storageName = 'comments';
-                Store.save(storageName,{
-                    "id":id,"publisher":publisher,"content":this.comment,"created_at":date});
+                Store.save(this.storageName,singleComment);
 
-                /*通知父组件App有新评论*/
-                this.$emit('new-comment',
-                    {
-                        "id":id,
-                        "publisher":publisher,
-                        "content":this.comment,
-                        "created_at":date
-                    }
-                    );
+                /*更新评论*/
+                this.comments.unshift(singleComment);
+                ths.totalCount = this.comments.length;
+                this.setCurrentComments(1);
 
                 this.comment = '';
             },
@@ -57,13 +79,48 @@
             // save: function(name,items) {
             //     window.localStorage.setItem(name,JSON.stringify(items));
             // },
-        }
+            /*显示特定页码上的评论*/
+            setCurrentComments: function(page) {
+                /*记录当前page*/
+                this.currentPage = page;
+
+                console.log("totalCount:" + this.totalCount);
+
+                /*特定page评论*/
+                this.currentComments = [];
+                let start = this.pageSize * (page - 1);
+                let end = this.pageSize * page;
+                for(let i = start;i < this.totalCount && i < end;i++) {
+                    //console.log(i + "for");
+                    this.currentComments.push(this.comments[i]);
+                }
+                console.log("currentComments count:" + this.currentComments.length);
+            },
+        },
+        mounted: function() {
+            this.$nextTick(() => {
+                /*初始化评论*/
+                this.comments = Store.fetch(this.storageName);
+                console.log("mounted-commentsLength: " + this.comments.length);
+                this.totalCount = this.comments.length;
+                this.setCurrentComments(1);
+            });
+        },
     }
 </script>
 
 <style>
     .commentInput {
-        width: 40%;
-        margin-left: 30%;
+        margin-left: 10%;
+        width: 80%;
     }
+
+    .commentInput ul {
+        list-style-type: none;
+
+    }
+
+    .commentInput ul li {
+    }
+
 </style>
