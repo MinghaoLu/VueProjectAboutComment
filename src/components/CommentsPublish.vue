@@ -4,44 +4,27 @@
         </textarea>
         <input type="button" name="publish" value="发送" v-on:click='publish'>
 
-        <ul>
-            <li
-                is="commentsshow"
-                v-for="item in currentComments"
-                v-bind:key="item.id"
-                v-bind:post="item">
-            </li>
-        </ul>
+        <comments-show v-bind:comments='comments'></comments-show>
 
-        <el-pagination
-            layout="prev, pager, next"
-            :total="totalCount"
-            :page-size="pageSize"
-            :current-page="currentPage"
-            v-on:current-change="setCurrentComments">
-        </el-pagination>
+
     </div>
 </template>
 
 <script>
     import Store from '../store.js'
-    import commentsshow from './CommentsShow.vue'
+    import CommentsShow from './CommentsShow.vue'
 
     export default {
-        name: "CommentsPublish",/*可有可无*/
+        name: "CommentsPublish",/*不影响*/
         data: function() {
             return {
                 storageName: 'comments',
                 comment: '',
-                currentComments: [],
                 comments: [],
-                totalCount: 0,
-                pageSize: 5,
-                currentPage: 1,
             }
         },
         components: {
-            commentsshow
+            CommentsShow
         },
         methods: {
             /*发送评论*/
@@ -66,8 +49,6 @@
 
                 /*更新评论*/
                 this.comments.unshift(singleComment);
-                ths.totalCount = this.comments.length;
-                this.setCurrentComments(1);
 
                 this.comment = '';
             },
@@ -79,31 +60,13 @@
             // save: function(name,items) {
             //     window.localStorage.setItem(name,JSON.stringify(items));
             // },
-            /*显示特定页码上的评论*/
-            setCurrentComments: function(page) {
-                /*记录当前page*/
-                this.currentPage = page;
 
-                console.log("totalCount:" + this.totalCount);
-
-                /*特定page评论*/
-                this.currentComments = [];
-                let start = this.pageSize * (page - 1);
-                let end = this.pageSize * page;
-                for(let i = start;i < this.totalCount && i < end;i++) {
-                    //console.log(i + "for");
-                    this.currentComments.push(this.comments[i]);
-                }
-                console.log("currentComments count:" + this.currentComments.length);
-            },
         },
         mounted: function() {
             this.$nextTick(() => {
                 /*初始化评论*/
                 this.comments = Store.fetch(this.storageName);
                 console.log("mounted-commentsLength: " + this.comments.length);
-                this.totalCount = this.comments.length;
-                this.setCurrentComments(1);
             });
         },
     }

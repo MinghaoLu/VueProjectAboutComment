@@ -1,16 +1,15 @@
 <template>
   <div id="app">
     <!-- <img src="./assets/logo.png"> -->
-    <!-- 评论发送区域 -->
-    <commentspublish></commentspublish>
+    <!-- 评论从发送开始 -->
+    <comments-publish></comments-publish>
     <!-- <commentsshow v-bind:post='singleComment'></commentsshow> -->
-    <!-- 评论显示区域 -->
   </div>
 
 </template>
 <!--  -->
 <script>
-import commentspublish from './components/CommentsPublish.vue'
+import CommentsPublish from './components/CommentsPublish.vue'
 /*import commentsshow from './components/CommentsShow.vue'*/
 
 export default {
@@ -21,7 +20,7 @@ export default {
     }
   },
   components: {
-    commentspublish
+    CommentsPublish
   },
   methods: {
     /*接收新评论并发送给子组件CommentsShow*/
